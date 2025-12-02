@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Camera Shot Prompts</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --card-hover: #e3f2fd;
+            --text-color: #333;
+            --border-color: #bbdefb;
+            --accent-color: #004d99;
+            --tag-color: #e65100;
+            --prompt-bg: #e3f2fd;
+            --prompt-border: #2196f3;
+        }
+        /* Fix: change .dark-mode to body.dark-mode */
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --card-hover: #2a2a2a;
+            --text-color: #f0f0f0;
+            --border-color: #333;
+            --accent-color: #bb86fc;
+            --tag-color: #ff7043;
+            --prompt-bg: #2d2d2d;
+            --prompt-border: #bb86fc;
+        }
+        /* Basic Reset and Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent-color);
+        }
+        /* Search Bar */
+        .search-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        #search {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            font-size: 16px;
+        }
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .dark-mode-toggle button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* Category Styling */
+        .category {
+            margin-bottom: 40px;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .category-title {
+            color: var(--tag-color);
+            border-bottom: 2px solid var(--tag-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        /* Prompt Card Styling */
+        .prompt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .prompt-card {
+            background-color: var(--prompt-bg);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--prompt-border);
+            border-radius: 4px;
+            padding: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .prompt-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        .prompt-tag {
+            font-weight: bold;
+            color: var(--tag-color);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+            word-break: break-word;
+        }
+        .prompt-description {
+            font-size: 0.9em;
+            color: var(--text-color);
+            margin-top: 10px;
+            padding-top: 5px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .prompt-image {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            object-fit: auto;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .edit-buttons {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .edit-buttons button {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .edit-buttons button.save {
+            background: #4CAF50;
+        }
+        /* Utility for copy success */
+        .copy-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .copy-message.show {
+            opacity: 1;
+        }
+        /* Modal for editing */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            color: var(--text-color);
+        }
+        .modal textarea {
+            width: 100%;
+            height: 150px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .modal-buttons button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-buttons .save {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .modal-buttons .cancel {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="dark-mode-toggle">
+        <button id="dark-mode-toggle">Dark Mode</button>
+    </div>
+    <div class="container">
+        <h1>📸 Comprehensive Camera Shot Prompts for Image Generation</h1>
+        <div class="search-container">
+            <input type="text" id="search" placeholder="Search prompts...">
+        </div>
+
+        <div class="category">
+            <h2 class="category-title">CAMERA ANGLES & ORIENTATIONS</h2>
+            <div class="prompt-grid" id="angles-grid"></div>
+        </div>
+
+        <hr>
+        <div class="category">
+            <h2 class="category-title">CAMERA SHOTS (FRAMING / DISTANCE)</h2>
+            <div class="prompt-grid" id="shots-grid"></div>
+        </div>
+
+        <hr>
+        <div class="category">
+            <h2 class="category-title">COMPOSITION-STYLE SHOT TAGS</h2>
+            <div class="prompt-grid" id="composition-grid"></div>
+        </div>
+
+        <hr>
+        <div class="category">
+            <h2 class="category-title">MOVEMENT-RELATED CAMERA SHOTS</h2>
+            <div class="prompt-grid" id="movement-grid"></div>
+        </div>
+
+        <hr>
+        <div class="category">
+            <h2 class="category-title">LENS / PERSPECTIVE TYPE TAGS</h2>
+            <div class="prompt-grid" id="lens-grid"></div>
+        </hr>
+
+        <hr>
+        <div class="category">
+            <h2 class="category-title">SPECIAL POV / PERSPECTIVE TAGS</h2>
+            <div class="prompt-grid" id="special-grid"></div>
+        </div>
+    </div>
+
+    <div id="copy-message" class="copy-message">Copied complete prompt to clipboard!</div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Prompt</h3>
+            <textarea id="edit-text"></textarea>
+            <div class="modal-buttons">
+                <button class="save" id="save-edit">Save</button>
+                <button class="cancel" id="cancel-edit">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Prompt data
+        const prompts = {
+            angles: [
+                { tag: "LOW ANGLE", description: "[SUBJECT](Low-angle shot: camera positioned below eye level, looking up at the subject. Creates a sense of power, dominance, and monumentality. appears larger, more imposing against the background.)" },
+                { tag: "HIGH ANGLE", description: "[SUBJECT](High-angle shot: camera positioned above eye level, looking down at the subject. Creates vulnerability, smallness, or overview perspective. Subject appears diminished or subordinate in the frame.)" },
+                { tag: "EYE LEVEL", description: "[SUBJECT](Eye-level shot: camera positioned at the subject's eye height, creating neutral, natural perspective. Establishes equality and realism, neither empowering nor diminishing the subject.)" },
+                { tag: "EXTREME LOW ANGLE", description: "[SUBJECT](Extreme low-angle shot: camera positioned very close to ground level, looking sharply upward. Creates dramatic scale distortion, towering effect, and powerful sense of dominance or intimidation.)" },
+                { tag: "EXTREME HIGH ANGLE", description: "[SUBJECT](Extreme high-angle shot: camera positioned far above subject, looking steeply downward. Creates isolation, vulnerability, or god's-eye perspective. Subject appears tiny within vast environment.)" },
+                { tag: "WORM-EYE VIEW", description: "[SUBJECT](View from below the subject, worm's-eye perspective, camera close to ground, looking up. Exaggerated scale, low-angle composition, emphasizing height and dominance of the subject.)" },
+                { tag: "BIRD-EYE VIEW", description: "[SUBJECT](Mild aerial viewpoint: the camera is placed above the subject, angled downward to create a clear bird's-eye view without distortion.)" },
+                { tag: "DUTCH ANGLE", description: "[SUBJECT](Mild Dutch camera angle: the camera is intentionally tilted off-balance on the roll axis, giving the composition a diagonal, dynamic feel, but with only a small tilt—not a full rotation.)" },
+                { tag: "DUTCH TILT", description: "[SUBJECT](Dutch tilt composition: camera rolled on its axis, creating slanted horizon line and diagonal perspective. Generates tension, disorientation, or psychological unease in the frame.)" },
+                { tag: "CANTED ANGLE", description: "(Canted angle shot: camera tilted sideways off horizontal axis, creating oblique composition. Conveys instability, tension, or dynamic energy through off-kilter framing.)" },
+                { tag: "OVERHEAD ANGLE", description: "[SUBJECT](Overhead shot: camera positioned directly above subject, pointing straight down. Creates flat, graphic composition showing spatial relationships and patterns from above.)" },
+                { tag: "TOP-DOWN ANGLE", description: "[SUBJECT](Top-down perspective: camera looking directly downward onto subject from above. Emphasizes layout, arrangement, and spatial design with flattened perspective.)" },
+                { tag: "OBLIQUE ANGLE", description: "[SUBJECT](Oblique angle shot: camera positioned at diagonal angle to subject, neither parallel nor perpendicular. Creates depth, dimension, and dynamic three-dimensional perspective.)" },
+                { tag: "SIDE ANGLE", description: "[SUBJECT](Side-angle shot: camera positioned perpendicular to subject, capturing pure profile view. Emphasizes silhouette, outline, and lateral dimension of subject.)" },
+                { tag: "FRONT ANGLE", description: "[SUBJECT](Front-facing angle: camera positioned directly in front of subject, creating symmetrical frontal view. Establishes direct confrontation, intimacy, or formal presentation.)" },
+                { tag: "BACK ANGLE", description: "[SUBJECT](Back-angle shot: camera positioned behind subject, showing rear view. Creates mystery, anonymity, or shares subject's perspective of what lies ahead.)" },
+                { tag: "THREE-QUARTER ANGLE", description: "[SUBJECT](Three-quarter angle shot: camera positioned at 45-degree angle to subject, showing both front and side. Creates depth, dimensionality, and natural, flattering perspective.)" },
+                { tag: "PROFILE ANGLE", description: "[SUBJECT](Profile shot: camera capturing subject from pure side view, showing complete silhouette. Emphasizes facial features, body contour, and outline against background.)" },
+                { tag: "DIAGONAL ANGLE", description: "[SUBJECT](Strong diagonal layout: the composition positions the subject along a bold diagonal path, enhancing energy and flow within the frame.)" },
+                { tag: "TILT-UP ANGLE", description: "[SUBJECT](Tilt-up composition: camera angled upward from lower position, gradually revealing subject from bottom to top. Creates anticipation, grandeur, or revealing movement.)" },
+                { tag: "TILT-DOWN ANGLE", description: "[SUBJECT](Tilt-down composition: camera angled downward from higher position, showing subject from top descending. Creates survey, assessment, or descending perspective.)" },
+                { tag: "POV ANGLE", description: "[SUBJECT](Point-of-view shot: camera positioned to replicate exact perspective of a character's eyes. Creates immersive, subjective experience of seeing through character's viewpoint.)" },
+                { tag: "REVERSE POV ANGLE", description: "[SUBJECT](Reverse POV shot: camera showing what is looking at the POV character. Reveals the subject of character's gaze, completing visual conversation between perspectives.)" },
+                { tag: "BACK-TO-CAMERA ANGLE", description: "[SUBJECT](Back-to-camera shot: subject positioned with back toward camera, facing away. Creates anonymity, contemplation, or shares subject's forward-looking perspective.)" }
+            ],
+            shots: [
+                { tag: "EXTREME WIDE SHOT", description: "[SUBJECT](Extreme wide shot: camera positioned very far from subject, showing vast environment. Subject appears small within expansive landscape, emphasizing scale and context.)" },
+                { tag: "WIDE SHOT", description: "[SUBJECT](Wide shot: camera captures subject fully within environment, showing complete body and surrounding space. Establishes location, context, and spatial relationships.)" },
+                { tag: "LONG SHOT", description: "[SUBJECT](Long shot: camera positioned at distance showing full subject from head to toe with surrounding space. Balances subject presence with environmental context.)" },
+                { tag: "FULL BODY SHOT", description: "[SUBJECT](Full body shot: camera framing captures subject's entire body from head to feet. Shows complete physical presence, posture, and body language within frame.)" },
+                { tag: "MEDIUM LONG SHOT", description: "[SUBJECT](Medium long shot: camera frames subject from approximately knees upward. Often called \"cowboy shot,\" balancing body language visibility with facial detail.)" },
+                { tag: "MEDIUM SHOT", description: "[SUBJECT](Medium shot: camera frames subject from waist up, showing torso, arms, and head. Balances facial expression with body language and gestures.)" },
+                { tag: "MEDIUM CLOSE-UP", description: "[SUBJECT](Medium close-up shot: camera frames subject from chest upward, emphasizing face while including shoulders. Intimate yet maintaining some physical context.)" },
+                { tag: "CLOSE-UP", description: "[SUBJECT](Close-up: the camera is positioned very near the subject, capturing all subject in the frame.)" },
+                { tag: "EXTREME CLOSE-UP", description: "[SUBJECT](Extreme close-up shot: camera frames very tight on specific detail—eyes, mouth, hands, or object. Creates intense intimacy, emphasis, or dramatic focus.)" },
+                { tag: "MACRO SHOT", description: "[SUBJECT](Macro shot: camera with macro lens positioned extremely close to small subject, revealing minute details invisible to naked eye. Creates abstract, detailed, magnified perspective.)" },
+                { tag: "COWBOY SHOT", description: "[SUBJECT](Cowboy shot: camera frames subject from mid-thigh upward, traditionally showing gunbelt in Western films. Emphasizes stance, readiness, and body language.)" },
+                { tag: "KNEE SHOT", description: "[SUBJECT](Knee shot: camera frames subject from knees upward, showing most of body while maintaining facial detail. Provides strong sense of physical presence.)" },
+                { tag: "SHOULDER SHOT", description: "[SUBJECT](Shoulder shot: camera frames subject from shoulders up, focusing on face and upper torso. Creates intimacy while maintaining personal space boundary.)" },
+                { tag: "BUST SHOT", description: "[SUBJECT](Bust shot: camera frames subject from chest upward, capturing head, neck, and upper torso. Classic portrait framing emphasizing facial expression and upper body.)" },
+                { tag: "HEADSHOT", description: "[SUBJECT](Headshot: camera tightly frames subject's head and face, filling frame from top of head to just below chin. Maximum facial detail and emotional intimacy.)" },
+                { tag: "TIGHT SHOT", description: "[SUBJECT](Tight shot: camera framed extremely close to subject with minimal surrounding space. Creates claustrophobic, intense, or highly focused composition.)" }
+            ],
+            composition: [
+                { tag: "CENTERED COMPOSITION", description: "[SUBJECT](Centered composition: subject positioned in exact center of frame, creating symmetrical, balanced, formal arrangement. Emphasizes subject importance and stability.)" },
+                { tag: "RULE-OF-THIRDS COMPOSITION", description: "[SUBJECT](Rule-of-thirds composition: frame divided into 3x3 grid, subject positioned along gridlines or intersections. Creates balanced, natural, visually pleasing arrangement.)" },
+                { tag: "SYMMETRICAL SHOT", description: "[SUBJECT](Symmetrical shot: composition with balanced elements mirrored on either side of central axis. Creates harmony, formality, and aesthetic perfection.)" },
+                { tag: "ASYMMETRICAL SHOT", description: "[SUBJECT](Asymmetrical shot: composition with unbalanced element distribution, creating visual tension. Generates dynamic interest through intentional imbalance.)" },
+                { tag: "MINIMALIST SHOT", description: "[SUBJECT](Minimalist shot: composition with minimal elements, abundant empty space, simple forms. Emphasizes subject through reduction and negative space.)" },
+                { tag: "BUSY COMPOSITION", description: "[SUBJECT](Busy composition: frame filled with multiple elements, details, and visual information. Creates complexity, energy, or overwhelming sensory experience.)" },
+                { tag: "NEGATIVE SPACE SHOT", description: "[SUBJECT](Negative space shot: composition emphasizing empty areas around subject, using emptiness as design element. Creates isolation, focus, or breathing room.)" },
+                { tag: "LEADING LINES SHOT", description: "[SUBJECT](Leading lines composition: visual lines within frame guide viewer's eye toward subject. Creates depth, direction, and purposeful visual flow.)" },
+                { tag: "FOREGROUND FRAMING SHOT", description: "[SUBJECT](Foreground framing shot: elements in foreground create natural frame around subject. Adds depth, context, and directs attention to main subject.)" },
+                { tag: "OVER-THE-SHOULDER SHOT", description: "[SUBJECT](Over-the-shoulder shot: camera positioned behind one subject's shoulder, looking toward another. Creates conversational perspective and spatial relationship.)" },
+                { tag: "REACTION SHOT", description: "[SUBJECT](Reaction shot: camera captures subject responding to off-screen action or dialogue. Emphasizes emotional response and character perspective.)" },
+                { tag: "TWO-SHOT", description: "[SUBJECT](Two-shot: camera frames two subjects within same composition. Establishes relationship, interaction, or comparison between characters.)" },
+                { tag: "THREE-SHOT", description: "[SUBJECT](Three-shot: camera frames three subjects within composition, showing group dynamic. Creates triangular visual relationship and social interaction.)" },
+                { tag: "GROUP SHOT", description: "[SUBJECT](Group shot: camera captures multiple subjects arranged together in frame. Emphasizes collective presence, community, or ensemble dynamic.)" }
+            ],
+            movement: [
+                { tag: "TRACKING SHOT", description: "[SUBJECT](Tracking shot aesthetic: composition suggesting camera movement following subject laterally. Creates dynamic sense of motion, pursuit, or accompaniment.)" },
+                { tag: "DOLLY SHOT", description: "[SUBJECT](Dolly shot style: composition implying camera physically moving toward or away from subject on track. Creates smooth approach or retreat with depth change.)" },
+                { tag: "CRANE SHOT", description: "[SUBJECT](Crane shot perspective: composition suggesting camera positioned on crane, capable of sweeping vertical and horizontal movement. Creates grand, elevated, cinematic perspective.)" },
+                { tag: "BOOM SHOT", description: "[SUBJECT](Boom shot style: composition implying camera on boom arm, moving vertically. Creates rising or lowering perspective with dramatic reveal.)" },
+                { tag: "ZOOM SHOT", description: "[SUBJECT](Zoom shot aesthetic: composition suggesting focal length change, appearing to move closer or farther. Creates intensity increase or dramatic distance change.)" },
+                { tag: "PUSH-IN SHOT", description: "[SUBJECT](Push-in composition: framing suggesting camera moving steadily closer to subject. Creates building tension, intimacy, or focused attention.)" },
+                { tag: "PULL-BACK SHOT", description: "[SUBJECT](Pull-back composition: framing suggesting camera moving away from subject, revealing context. Creates revelation, scope expansion, or isolation.)" },
+                { tag: "PAN SHOT", description: "[SUBJECT](Pan shot style: composition implying horizontal camera rotation across scene. Creates sweeping survey, landscape revelation, or spatial exploration.)" },
+                { tag: "TILT SHOT", description: "[SUBJECT](Tilt shot aesthetic: composition suggesting vertical camera rotation, scanning up or down. Creates height revelation or vertical space exploration.)" },
+                { tag: "ARC SHOT", description: "[SUBJECT](Arc shot composition: framing suggesting camera moving in curved path around subject. Creates dimensional reveal, dynamic perspective, and circular motion.)" },
+                { tag: "360-DEGREE SHOT", description: "[SUBJECT](360-degree perspective: composition implying complete circular camera path around subject. Creates comprehensive spatial understanding and dynamic rotation.)" },
+                { tag: "STATIC SHOT", description: "[SUBJECT](Static shot: camera fixed in single position without movement. Creates stability, observation, and deliberate, contemplative framing.)" }
+            ],
+            lens: [
+                { tag: "WIDE-ANGLE SHOT", description: "[SUBJECT](Wide-angle lens shot: composition showing expanded field of view with slight barrel distortion. Exaggerates space, depth, and environmental scope.)" },
+                { tag: "ULTRA-WIDE SHOT", description: "[SUBJECT](Ultra-wide lens shot: composition with extremely expanded field of view and pronounced barrel distortion. Creates dramatic spatial exaggeration and immersive perspective.)" },
+                { tag: "FISHEYE SHOT", description: "[SUBJECT](Fisheye lens shot: composition with spherical distortion creating circular, bulging perspective. Dramatically warps space, creating surreal, immersive viewpoint.)" },
+                { tag: "TELEPHOTO SHOT", description: "[SUBJECT](Telephoto lens shot: composition with compressed perspective, flattened depth, and narrow field of view. Creates isolated subject with beautifully blurred background.)" },
+                { tag: "PORTRAIT-LENS SHOT", description: "[SUBJECT](Portrait-lens shot: composition with shallow depth of field, subject sharp against softly blurred background. Creates pleasing bokeh and subject isolation.)" },
+                { tag: "MACRO-LENS SHOT", description: "[SUBJECT](Macro-lens shot: composition capturing extreme detail of small subject at very close range. Reveals microscopic textures and details with minimal depth of field.)" },
+                { tag: "TILT-SHIFT SHOT", description: "[SUBJECT](Tilt-shift lens shot: composition with selective focus plane, creating miniature effect or corrected perspective. Produces dreamy, toy-like, or architecturally corrected view.)" },
+                { tag: "ANAMORPHIC SHOT", description: "[SUBJECT](Anamorphic lens shot: composition with characteristic wide aspect ratio, horizontal lens flares, and oval bokeh. Creates cinematic, premium visual aesthetic.)" }
+            ],
+            special: [
+                { tag: "FIRST-PERSON SHOT", description: "[SUBJECT](First-person perspective: camera represents character's own eyes, showing what they see. Creates immersive, subjective experience of being the character.)" },
+                { tag: "THIRD-PERSON SHOT", description: "[SUBJECT](Third-person perspective: camera observing subject from outside their body. Creates objective viewpoint watching character from external position.)" },
+                { tag: "OBJECT POV SHOT", description: "[SUBJECT](Object POV shot: camera positioned at perspective of inanimate object, showing scene from object's \"viewpoint.\" Creates unusual, creative perspective.)" },
+                { tag: "DRONE SHOT", description: "[SUBJECT](Drone shot perspective: elevated aerial view with smooth, floating quality. Creates sweeping, bird's-eye perspective with contemporary aesthetic.)" },
+                { tag: "SURVEILLANCE CAMERA SHOT", description: "[SUBJECT](Surveillance camera angle: high-corner mounted perspective with wide-angle distortion, timestamp overlay aesthetic. Creates voyeuristic, security monitoring viewpoint.)" },
+                { tag: "SECURITY CAM ANGLE", description: "[SUBJECT](Security cam perspective: fixed high-angle viewpoint with grainy quality, suggesting CCTV footage. Creates documentary, monitoring, or found-footage aesthetic.)" },
+                { tag: "DASHCAM ANGLE", description: "[SUBJECT](Dashcam perspective: forward-facing view from vehicle dashboard, showing road ahead. Creates point-of-view from driver's position with characteristic wide angle.)" },
+                { tag: "BODYCAM ANGLE", description: "[SUBJECT](Bodycam perspective: chest-height POV with slight bounce, showing forward view with partial body visible. Creates documentary, law-enforcement, or action aesthetic.)" },
+                { tag: "HELMET CAM SHOT", description: "[SUBJECT](Helmet cam perspective: head-mounted viewpoint showing first-person view from subject's head position. Creates extreme sports, action, or immersive adventure aesthetic.)" },
+                { tag: "MICROSCOPE POV", description: "[SUBJECT](Microscope viewpoint: extreme magnification showing microscopic details with circular vignette. Creates scientific, detailed perspective of tiny subjects.)" },
+                { tag: "TELESCOPE POV", description: "[SUBJECT](Telescope viewpoint: distant view through circular vignette, showing magnified far-away subjects. Creates astronomical, surveillance, or distant observation perspective.)" }
+            ]
+        };
+
+        // Current editing card and category
+        let currentEditCard = null;
+        let currentEditCategory = null;
+
+        // DOM elements
+        const copyMessage = document.getElementById('copy-message');
+        const editModal = document.getElementById('edit-modal');
+        const editText = document.getElementById('edit-text');
+        const saveEdit = document.getElementById('save-edit');
+        const cancelEdit = document.getElementById('cancel-edit');
+        const searchInput = document.getElementById('search');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+        // Enable dark mode by default
+        document.body.classList.add('dark-mode');
+
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            darkModeToggle.textContent = document.body.classList.contains('dark-mode')
+                ? 'Light Mode'
+                : 'Dark Mode';
+        });
+
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+            renderPrompts();
+            setupEventListeners();
+        });
+
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('promptsData', JSON.stringify(prompts));
+        }
+
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            const data = localStorage.getItem('promptsData');
+            if (data) {
+                Object.assign(prompts, JSON.parse(data));
+            }
+        }
+
+        // Render all prompts to the page
+        function renderPrompts() {
+            for (const [category, promptList] of Object.entries(prompts)) {
+                const grid = document.getElementById(`${category}-grid`);
+                grid.innerHTML = '';
+                promptList.forEach(prompt => {
+                    const card = createPromptCard(prompt, category);
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // Create a prompt card element
+        function createPromptCard(prompt, category) {
+            const card = document.createElement('div');
+            card.className = 'prompt-card';
+            card.dataset.category = category;
+            card.dataset.tag = prompt.tag;
+
+            // Image
+            const img = document.createElement('img');
+            img.className = 'prompt-image';
+            const baseName = prompt.tag.replace(/ /g, '_');
+            // Try PNG first, fallback to JPG
+            img.src = `images/${baseName}.png`;
+            img.onerror = () => {
+                img.src = `images/${baseName}.png`;
+                img.onerror = () => { img.style.display = 'none'; };
+            };
+            card.appendChild(img);
+
+            // Tag
+            const tag = document.createElement('span');
+            tag.className = 'prompt-tag';
+            tag.textContent = prompt.tag;
+            card.appendChild(tag);
+
+            // Description
+            const desc = document.createElement('p');
+            desc.className = 'prompt-description';
+            desc.textContent = prompt.description;
+            card.appendChild(desc);
+
+            // Edit buttons
+            const editButtons = document.createElement('div');
+            editButtons.className = 'edit-buttons';
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditModal(card, category);
+            });
+            editButtons.appendChild(editBtn);
+            card.appendChild(editButtons);
+
+            // Click to copy
+            card.addEventListener('click', () => {
+                copyPrompt(card);
+            });
+
+            return card;
+        }
+
+        // Copy prompt to clipboard
+        function copyPrompt(card) {
+            const tag = card.querySelector('.prompt-tag').textContent;
+            const desc = card.querySelector('.prompt-description').textContent;
+            const fullPrompt = `${tag}: ${desc}`;
+
+            navigator.clipboard.writeText(fullPrompt).then(() => {
+                copyMessage.classList.add('show');
+                setTimeout(() => {
+                    copyMessage.classList.remove('show');
+                }, 1500);
+                card.style.backgroundColor = '#a5d6a7';
+                setTimeout(() => {
+                    card.style.backgroundColor = '';
+                }, 200);
+            });
+        }
+
+        // Open edit modal
+        function openEditModal(card, category) {
+            currentEditCard = card;
+            currentEditCategory = category;
+            const tag = card.querySelector('.prompt-tag').textContent;
+            const desc = card.querySelector('.prompt-description').textContent;
+            editText.value = `${tag}\n${desc}`;
+            editModal.style.display = 'block';
+        }
+
+        // Save edited prompt
+        function saveEditedPrompt() {
+            const lines = editText.value.split('\n');
+            const tag = lines[0];
+            const description = lines.slice(1).join('\n');
+
+            // Update the card
+            currentEditCard.querySelector('.prompt-tag').textContent = tag;
+            currentEditCard.querySelector('.prompt-description').textContent = description;
+
+            // Update the data
+            const category = currentEditCategory;
+            const index = prompts[category].findIndex(p => p.tag === currentEditCard.dataset.tag);
+            if (index !== -1) {
+                prompts[category][index].tag = tag;
+                prompts[category][index].description = description;
+                currentEditCard.dataset.tag = tag;
+            }
+
+            editModal.style.display = 'none';
+            saveToLocalStorage();
+        }
+
+// Setup event listeners
+function setupEventListeners() {
+    saveEdit.addEventListener('click', saveEditedPrompt);
+    cancelEdit.addEventListener('click', () => {
+        editModal.style.display = 'none';
+    });
+
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase();
+
+        // Filter cards by TAG only
+        document.querySelectorAll('.prompt-card').forEach(card => {
+            const tag = card.querySelector('.prompt-tag').textContent.toLowerCase();
+            card.style.display = tag.includes(searchTerm) ? 'block' : 'none';
+        });
+
+        // Hide categories with no visible cards
+        document.querySelectorAll('.category').forEach(category => {
+            const cards = category.querySelectorAll('.prompt-card');
+            const hasVisibleCards = Array.from(cards).some(card => card.style.display !== 'none');
+            category.style.display = hasVisibleCards ? 'block' : 'none';
+        });
+    });
+
+
+}
+
+    </script>
+</body>
+</html>
