@@ -447,17 +447,23 @@
             card.dataset.category = category;
             card.dataset.tag = prompt.tag;
 
-            // Image
-            const img = document.createElement('img');
-            img.className = 'prompt-image';
-            const baseName = prompt.tag.replace(/ /g, '_');
-            // Try PNG first, fallback to JPG
+        // Image
+        const img = document.createElement('img');
+        img.className = 'prompt-image';
+
+        const baseName = prompt.tag.replace(/ /g, '_');
+
+        // Try WebP first, fallback to PNG, then hide if missing
+        img.src = `images/${baseName}.webp`;
+        img.onerror = () => {
             img.src = `images/${baseName}.png`;
-            img.onerror = () => {
-                img.src = `images/${baseName}.png`;
-                img.onerror = () => { img.style.display = 'none'; };
+            img.onerror = () => { 
+                img.style.display = 'none'; 
             };
-            card.appendChild(img);
+        };
+
+        card.appendChild(img);
+
 
             // Tag
             const tag = document.createElement('span');
